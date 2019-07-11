@@ -15,6 +15,9 @@
 
         <link rel="home" href="{{ $page->baseUrl }}">
         <link rel="me" href="https://github.com/ralphschindler">
+        <link rel="webmention" href="https://webmention.io/ralphschindler.dev/webmention" />
+        <link rel="pingback" href="https://webmention.io/ralphschindler.dev/xmlrpc" />
+
 {{--        <link rel="icon" href="/favicon.ico">--}}
 {{--        <link href="/blog/feed.atom" type="application/atom+xml" rel="alternate" title="{{ $page->siteName }} Atom Feed">--}}
 
