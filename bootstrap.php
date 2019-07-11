@@ -16,3 +16,6 @@
 
 $events->afterBuild(App\Listeners\GenerateSitemap::class);
 $events->afterBuild(App\Listeners\GenerateIndex::class);
+
+// $markdown = $container->get(TightenCo\Jigsaw\Parsers\Mar);
+// var_dump($markdown);

@@ -9,22 +9,14 @@ return [
 
     // collections
     'collections' => [
-        'posts' => [
-            'author' => 'Author Name', // Default author, if not provided in a post
+        'articles' => [
+            'author' => 'Ralph Schindler', // Default author, if not provided in a post
             'sort' => '-date',
-            'path' => 'blog/{filename}',
+            'path' => 'article/{filename}',
         ],
-        'categories' => [
-            'path' => '/blog/categories/{filename}',
-            'posts' => function ($page, $allPosts) {
-                return $allPosts->filter(function ($post) use ($page) {
-                    return $post->categories ? in_array($page->getFilename(), $post->categories, true) : false;
-                });
-            },
-        ],
-        'laravel-tips' => [
-            'path' => 'laravel-tips/{filename}'
-        ]
+        // 'laravel-tips' => [
+        //     'path' => 'laravel-tips/{filename}'
+        // ]
     ],
 
     // helpers

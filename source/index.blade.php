@@ -1,25 +1,25 @@
 @extends('_layouts.master')
 
 @section('body')
-    @foreach ($posts->where('featured', true) as $featuredPost)
+    @foreach ($articles->where('featured', true) as $featuredArticle)
         <div class="w-full mb-6">
-            @if ($featuredPost->cover_image)
-                <img src="{{ $featuredPost->cover_image }}" alt="{{ $featuredPost->title }} cover image" class="mb-6">
+            @if ($featuredArticle->cover_image)
+                <img src="{{ $featuredArticle->cover_image }}" alt="{{ $featuredArticle->title }} cover image" class="mb-6">
             @endif
 
-            <p class="text-grey-darker font-medium my-2">
-                {{ $featuredPost->getDate()->format('F j, Y') }}
+            <p class="text-gray-700 font-medium my-2">
+                {{ $featuredArticle->getDate()->format('F j, Y') }}
             </p>
 
             <h2 class="text-3xl mt-0">
-                <a href="{{ $featuredPost->getUrl() }}" title="Read {{ $featuredPost->title }}" class="text-black font-extrabold">
-                    {{ $featuredPost->title }}
+                <a href="{{ $featuredArticle->getUrl() }}" title="Read {{ $featuredArticle->title }}" class="text-black font-extrabold">
+                    {{ $featuredArticle->title }}
                 </a>
             </h2>
 
-            <p class="mt-0 mb-4">{!! $featuredPost->getExcerpt() !!}</p>
+            <p class="mt-0 mb-4">{!! $featuredArticle->getExcerpt() !!}</p>
 
-            <a href="{{ $featuredPost->getUrl() }}" title="Read - {{ $featuredPost->title }}" class="uppercase tracking-wide mb-4">
+            <a href="{{ $featuredArticle->getUrl() }}" title="Read - {{ $featuredArticle->title }}" class="uppercase tracking-wide mb-4">
                 Read
             </a>
         </div>
@@ -29,11 +29,11 @@
         @endif
     @endforeach
 
-    @foreach ($posts->where('featured', false)->take(6)->chunk(2) as $row)
+    @foreach ($articles->where('featured', false)->take(6)->chunk(2) as $row)
         <div class="flex flex-col md:flex-row md:-mx-6">
-            @foreach ($row as $post)
+            @foreach ($row as $article)
                 <div class="w-full md:w-1/2 md:mx-6">
-                    @include('_components.post-preview-inline')
+                    @include('_components.article-preview-inline', compact('article'))
                 </div>
 
                 @if (! $loop->last)

@@ -20,26 +20,36 @@
         @stack('meta')
 
         @if ($page->production)
-            <!-- Insert analytics code here -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id=UA-143777600-1"></script>
+            <script>
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+
+              gtag('config', 'UA-143777600-1');
+            </script>
         @endif
 
         <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:300,300i,400,400i,700,700i,800,800i" rel="stylesheet">
         <link rel="stylesheet" href="{{ mix('css/main.css', 'assets/build') }}">
     </head>
 
-    <body class="flex flex-col justify-between min-h-screen text-grey-darkest leading-normal font-sans">
+    <body class="flex flex-col justify-between min-h-screen text-gray-800 leading-normal font-sans">
         <header class="flex items-center shadow bg-white border-b h-24 py-4" role="banner">
-            <div class="container flex items-center max-w-4xl mx-auto px-4 lg:px-8">
+            <div class="container flex items-center max-w-6xl mx-auto px-4 lg:px-8">
                 <div class="flex items-center">
                     <a href="/" title="{{ $page->siteName }} home" class="inline-flex items-center">
                         <img class="block h-12 sm:h-16 rounded-full mx-auto mb-4 sm:mb-0 sm:mr-4 sm:ml-0" src="https://avatars2.githubusercontent.com/u/76674?v=4" alt="">
-                        <h1 class="text-lg md:text-2xl text-red-darkest font-semibold hover:text-red-dark my-0">{{ $page->siteName }}</h1>
+                        <div>
+                            <h1 class="text-lg md:text-2xl text-red-800 font-semibold hover:text-red-600 my-0">{{ $page->siteName }}</h1>
+                            <div class="text-purple-800 text-xs">
+                                Software Architect at Ziff Media Group
+                            </div>
+                        </div>
                     </a>
                 </div>
 
                 <div id="vue-search" class="flex flex-1 justify-end items-center">
-                    <search></search>
-
                     @include('_nav.menu')
 
                     @include('_nav.menu-toggle')
@@ -49,7 +59,7 @@
 
         @include('_nav.menu-responsive')
 
-        <main role="main" class="flex-auto w-full container max-w-xl mx-auto py-16 px-6">
+        <main role="main" class="flex-auto w-full container max-w-4xl mx-auto py-16 px-6">
             @yield('body')
         </main>
 

@@ -1,4 +1,4 @@
-@tailwind preflight;
+@tailwind base;
 @tailwind components;
 
 // Code syntax highlighting,
@@ -8,6 +8,6 @@
 @import 'base';
 @import 'navigation';
 @import 'mailchimp';
-@import 'blog';
+@import 'articles';
 
 @tailwind utilities;

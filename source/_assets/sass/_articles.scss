@@ -1,0 +1,11 @@
+// Your custom blog styles here
+
+main ul {
+  @apply pl-6;
+}
+
+main ul li {
+  @apply list-disc;
+  @apply list-outside;
+  //@apply pl-4;
+}
