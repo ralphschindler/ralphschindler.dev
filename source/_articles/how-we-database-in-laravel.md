@@ -9,7 +9,7 @@ featured: true
 categories: [laravel]
 ---
 
-I'll first set the stage without going deep into our whole stack, but enough so there is a clear picture why and how we do what we do.  Nearly all of our Laravel based applications at [https://www.ziffdavis.com](Ziff Media Group) are MySQL (AWS Aurora) backed.  Our application are deployed into a K8s cluster, our containers are Docker, the filesystem accessible to the application is typically AWS S3.
+I'll first set the stage without going deep into our whole stack, but enough so there is a clear picture why and how we do what we do.  Nearly all of our Laravel based applications at [Ziff Media Group](https://www.ziffdavis.com) are MySQL (AWS Aurora) backed.  Our application are deployed into a K8s cluster, our containers are Docker, the filesystem accessible to the application is typically AWS S3.
 
 These projects are generally monorepo, and the development environment is brought to life by Docker Compose. A developer merely needs run `docker-compose up -d`, which typically brings up the application web instance (in which nginx and php-fpm are entwined), a mysql instance that matches the Aurora version, and sometimes a touch of Redis too depending on the projects needs.
 
@@ -33,7 +33,7 @@ It is also worth noting that the design of your system should be such that your 
 
 > Note: to keep smaller databases, it's best to keep only application specific / domain specific data in the database. Data records like logging should go to an appropriate log location, user audit trails should go to an audit specific transfer and storage medium.  If that is not possible, keeping them in your production database but selecting which tables to NOT include in a snapshot is also possible.
 
-Originally, we achieved this through using a Spatie package [https://github.com/spatie/laravel-db-snapshots](spatie/laravel-db-snapshots). For most people's needs, this will work perfectly well. This tool shines when your production database is only a few megs.  It starts to break down when your production data set is beyond several megs. (The reason for this is that all the SQL in the mysqldump dump file is executed inside PHP's PDO query method when loading the data back in. This means you're bound by PHP's memory_limit and MySQL's client limitations: packet sizing, etc. I'm sure a pull request for this feature would be welcome).
+Originally, we achieved this through using a Spatie package [spatie/laravel-db-snapshots](https://github.com/spatie/laravel-db-snapshots). For most people's needs, this will work perfectly well. This tool shines when your production database is only a few megs.  It starts to break down when your production data set is beyond several megs. (The reason for this is that all the SQL in the mysqldump dump file is executed inside PHP's PDO query method when loading the data back in. This means you're bound by PHP's memory_limit and MySQL's client limitations: packet sizing, etc. I'm sure a pull request for this feature would be welcome).
 
 We settled on writing a highly specific Laravel Command to make nightly snapshots of production, we schedule this command to run **nightly**.  The gist of it's workflow is this:
 
@@ -48,7 +48,7 @@ We settled on writing a highly specific Laravel Command to make nightly snapshot
 Some other interesting things it does:
 
 - prevents mishaps by ensuring you're not creating during local development environments, and loading in production environments
-- it creates a mysql credentials file temporarily to ensure the mysql client won't complain about insecure usage of passwords (kudos to [https://github.com/spatie/db-dumper](spatie/db-dumper) for that idea)
+- it creates a mysql credentials file temporarily to ensure the mysql client won't complain about insecure usage of passwords (kudos to [spatie/db-dumper](https://github.com/spatie/db-dumper) for that idea)
 
 <script src="https://gist.github.com/ralphschindler/f29eba49eed76d384210a59daf900020.js"></script>
 
