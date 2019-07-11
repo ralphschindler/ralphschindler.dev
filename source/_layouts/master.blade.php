@@ -14,7 +14,8 @@
         <title>{{ $page->siteName }}{{ $page->title ? ' | ' . $page->title : '' }}</title>
 
         <link rel="home" href="{{ $page->baseUrl }}">
-        <link rel="icon" href="/favicon.ico">
+        <link rel="me" href="https://github.com/ralphschindler">
+{{--        <link rel="icon" href="/favicon.ico">--}}
 {{--        <link href="/blog/feed.atom" type="application/atom+xml" rel="alternate" title="{{ $page->siteName }} Atom Feed">--}}
 
         @stack('meta')

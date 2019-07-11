@@ -11,7 +11,7 @@ categories: [laravel]
 
 I'll first set the stage without going deep into our whole stack, but enough so there is a clear picture why and how we do what we do.  Nearly all of our Laravel based applications at [Ziff Media Group](https://www.ziffdavis.com) are MySQL (AWS Aurora) backed.  Our application are deployed into a K8s cluster, our containers are Docker, the filesystem accessible to the application is typically AWS S3.
 
-These projects are generally monorepo, and the development environment is brought to life by Docker Compose. A developer merely needs run `docker-compose up -d`, which typically brings up the application web instance (in which nginx and php-fpm are entwined), a mysql instance that matches the Aurora version, and sometimes a touch of Redis too depending on the projects needs.
+These projects are generally monorepo, and the development environment is brought to life by Docker Compose. A developer merely needs run `docker-compose up -d`, which typically brings up the application web instance (in which nginx and php-fpm are entwined), a mysql instance that matches the Aurora version, and sometimes a touch of Redis too, depending on the project's needs.
 
 ## Which Model To Choose
 
@@ -19,7 +19,7 @@ We've chosen the *"give developers a snapshot of production data"* model. This m
 
 #### The "run all the migrations and use seeders" Model:
 
-We chose not to use this model for two reasons.  The first is that it is typical that our projects would reach upwards of 50-100-200 migrations within a year, especially for the ones that have a large number of developers and/or are very active.  The second is that with seeding, you are generally working with contrived data.  Perhaps it is data created by Faker, or a set of real data. Either way, the Fake data offers less value, and the real data in a seeder will become stale quickly.  Both developers and QA Testers benefit from seeing real and current data in their development and QA instances of the project.
+We chose not to use this model for two reasons.  The first is that it is typical that our projects would reach upwards of hundreds of migrations within a year, especially for the ones that have a large number of developers and/or are very active.  The second is that with seeding, you are generally working with contrived data.  Perhaps it is data created by Faker, or a set of real data. Either way, the Fake data offers less value, and the real data in a seeder will quickly become stale.  Both developers and QA Testers benefit from seeing real and current data in their development and QA instances of the project.
 
 #### The "connect to a shared non-local database" Model:
 
@@ -56,13 +56,13 @@ This script could likely be made more generic and packaged up for broader use, b
 
 ### We never go down
 
-We don't write migration down methods. We never expect to use them. We'd never use them in production, and for development (while a developer is free to use them while they are hacking on a ticket/PR), getting back to a clean state is as simple as re-importing the production snapshot.
+We don't write migration down methods. We never expect to use them. By rule, we never use them in production.  For development, a developer is free to use them while they are hacking on a ticket/PR, but we don't expect that to be committed to the migration.  Getting back to a clean state is as simple as re-importing the production snapshot.
 
 ### Other Benefits To This Approach
 
 We have a CI/CD and QA tooling setup that allows us to have every PR to the project brought up and kept current with the PR until it is merged.  This means that at any given time, there might be a handful to dozens of versions of this project running in our QA environment and developers local machines.
 
-So for any given PR to be ready to go through a QA process, to go from scratch to working feature instance, the workflow roughly looks like this:
+So for any given PR to be ready to go through a QA process, from scratch to a working feature instance, the workflow roughly looks like this:
 
 - QA instance pulls down source repository and checks out feature branch
 - `docker-compose up -d` (just as a developer would)
