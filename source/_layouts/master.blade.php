@@ -4,22 +4,16 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <meta name="description" content="{{ $page->meta_description ?? $page->siteDescription }}">
-
-        <meta property="og:title" content="{{ $page->title ?  $page->title . ' | ' : '' }}{{ $page->siteName }}"/>
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="{{ $page->getUrl() }}"/>
-        <meta property="og:description" content="{{ $page->siteDescription }}" />
 
         <title>{{ $page->siteName }}{{ $page->title ? ' | ' . $page->title : '' }}</title>
+        <meta name="description" content="{{ $page->meta_description ?? $page->siteDescription }}">
 
         <link rel="home" href="{{ $page->baseUrl }}">
         <link rel="me" href="https://github.com/ralphschindler">
         <link rel="webmention" href="https://webmention.io/ralphschindler.dev/webmention" />
         <link rel="pingback" href="https://webmention.io/ralphschindler.dev/xmlrpc" />
 
-{{--        <link rel="icon" href="/favicon.ico">--}}
-{{--        <link href="/blog/feed.atom" type="application/atom+xml" rel="alternate" title="{{ $page->siteName }} Atom Feed">--}}
+        <link href="/articles/feed.atom" type="application/atom+xml" rel="alternate" title="{{ $page->siteName }} Atom Feed">
 
         @stack('meta')
 
@@ -29,7 +23,6 @@
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-
               gtag('config', 'UA-143777600-1');
             </script>
         @endif
