@@ -4,7 +4,7 @@ return [
     'baseUrl' => '',
     'production' => false,
     'siteName' => 'Ralph Schindler',
-    'siteDescription' => '',
+    'siteDescription' => 'Ralph Schindler is a PHP and Laravel enthusiast and a Software Architect at the Ziff Media Group',
     'siteAuthor' => 'Ralph Schindler',
 
     // collections

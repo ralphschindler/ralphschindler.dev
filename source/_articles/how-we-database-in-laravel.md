@@ -3,7 +3,7 @@ extends: _layouts.article
 section: content
 title: How We Database In Laravel
 date: 2019-07-11
-description: How we manage our production, qa, and developer databases for our Laravel Projects 
+description: How we manage our production, qa, and developer databases and snapshots for our Laravel Projects 
 cover_image: /assets/images/how-we-database-in-laravel-cover.png
 featured: true
 categories: [laravel]
@@ -15,7 +15,7 @@ These projects are generally monorepo, and the development environment is brough
 
 ## Which Model To Choose
 
-We've chosen the *"give developers a snapshot of production data"* model. This means both the current state of the database's schema as well as the data. Before exploring what that model looks like, here are the models we chose not to use:
+We've chosen the *"give developers a snapshot of production data"* model (a.k.a *The Individual Production Snapshot Model*). This means both the current state of the database's schema as well as the data. Before exploring what that model looks like, here are the models we chose not to use:
 
 #### The "run all the migrations and use seeders" Model:
 
