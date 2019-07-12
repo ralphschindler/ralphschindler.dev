@@ -11,7 +11,7 @@
     <meta name="twitter:creator" content="@ralphschindler">
     <meta name="twitter:title" content="{{ $page->title }}">
     <meta name="twitter:description" content="{{ $page->description }}">
-    <meta name="twitter:image" content="{{ $page->cover_image }}">
+    <meta name="twitter:image" content="{{ $page->baseUrl }}{{ $page->cover_image }}">
 @endpush
 
 @section('body')
