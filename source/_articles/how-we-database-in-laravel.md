@@ -84,3 +84,31 @@ There are several methods to producing this rollup migration:
 
 Finally, make sure to clear out your migrations table in your production database and replace it with a single record for the rollup where the id is 1 and the migration is equal to the name of the rollup migration file (without the .php suffix) and the batch is equal to 1.
 
+## What About That Sensitive Information In The Databse?
+
+> This section added on July 15, 2019 after discussions on twitter and reddit.
+
+Some bit of important context that was hinted at but not explicitly spelled out should be reiterated to better frame this solution.  Our websites and CMSes (typically the ones that churn features daily) have a "product person" that does the acceptance for a new feature or bugfix. This person, prefers to look at a live and timely representation of the website/CMS in order to complete the acceptance part of the process.  With that in mind, an up-to-the-day snapshot of production satisfies that requirement.
+
+Additionally, these sites generally do not sensitive information that needs to be shielded from our developers.  But if they did, here are a few steps we'd take before we abandon the "The Individual Production Snapshot Model":
+
+#### Structure Only Tables
+
+When using `mysqldump` you have there are two interesting options: 
+
+1. the ability to ignore certain tables with `--ignore-table` [manual](https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_ignore-table)
+2. the ability to do structure and no data for the whole import with `--no-data`: [manual](https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_no-data).
+
+To achieve full tables of non-sensitive data and structure only of sensitive data, a 2 file snapshot would need to be produced in the command. First use `mysqldump` to produce a snapshot of everything except the sensitive tables
+
+    mysqldump --skip-lock-tables --ignore-table=mydb.sensitive_table1 --ignore-table=mydb.sensitive_table2 mydatabase
+
+then use a second file with the structure of the sensitive tables using (*`mysqldump [options] db_name [tbl_name ...]`* syntax) 
+
+    mysqldump --skip-lock-tables --no-data mydatabase sensitive_table1 sensitive_table2`
+    
+Finally, use a seeder to generate a few well known seeds to stub in for the sensitive data.
+
+#### Protecting Sensitive Workflows
+
+This is a bit outside the scope of this article, but it's worth mentioning. Your local and QA environment probably shouldn't be sending mail out to a real SMTP server. If you have this functionality in an app, considering using a project like MailTrap (service) or a containerized app such as [MailDev](https://hub.docker.com/r/djfarrelly/maildev/).  Similarly, if you have API calls going to an API service, consider routing to a dev environment (if they provide one) or faking API calls.
