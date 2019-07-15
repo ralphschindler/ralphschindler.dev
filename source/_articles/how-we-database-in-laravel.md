@@ -84,7 +84,7 @@ There are several methods to producing this rollup migration:
 
 Finally, make sure to clear out your migrations table in your production database and replace it with a single record for the rollup where the id is 1 and the migration is equal to the name of the rollup migration file (without the .php suffix) and the batch is equal to 1.
 
-## What About That Sensitive Information In The Databse?
+## What About That Sensitive Information In The Database?
 
 > This section added on July 15, 2019 after discussions on twitter and reddit.
 

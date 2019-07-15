@@ -63,7 +63,7 @@
         <footer class="bg-white text-center text-sm mt-12 py-4" role="contentinfo">
             <ul class="flex flex-col md:flex-row justify-center list-reset">
                 <li class="md:mr-2">
-                    &copy; <a href="https://ralphschindler.com" title="Ralph Schindler">Ralph Schindler</a> {{ date('Y') }}.
+                    &copy; <a href="https://ralphschindler.dev" title="Ralph Schindler">Ralph Schindler</a> {{ date('Y') }}.
                 </li>
 
                 <li>
