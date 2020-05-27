@@ -2,6 +2,6 @@
 
 @section('entries')
     @foreach ($articles as $entry)
-        @include('_components.article-as-rss-item', compact('article'))
+        @include('_components.article-as-rss-item', compact('entry'))
     @endforeach
 @endsection
