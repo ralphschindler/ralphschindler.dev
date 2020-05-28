@@ -47,7 +47,7 @@ To use ULIDs in Laravel, php more specifically, we need to either write a genera
 
     composer require robinvdvleuten/ulid
 
-Then, let's build a migration and a model. The migration will look something like this:
+Then, let's build a migration, it will look something like this in the `up` method:
 
 ```php
     Schema::create('widgets', function (Blueprint $table) {
@@ -91,7 +91,7 @@ trait HasUlid
 }
 ```
 
-Now, our widget can consume this Trait:
+Now, our Widget model can consume this concern / trait:
 
 ```php
 <?php
@@ -100,7 +100,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class BetterWidget extends Model
+class Widget extends Model
 {
     use Concerns\HasUlid;
 }
