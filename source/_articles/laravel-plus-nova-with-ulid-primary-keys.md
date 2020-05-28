@@ -118,27 +118,23 @@ To achieve this change, we'll have to publish the Nova migration, so we can chan
 artisan vendor:publish --tag=nova-migrations
 ```
 
-Next, we'll have to go into `2018_01_01_000000_create_action_events_table.php`, and make the following changes (notated by the commented out parts):
+Next, we'll have to go into `2018_01_01_000000_create_action_events_table.php`, and make the following changes:
 
-```php
+```diff
     Schema::create('action_events', function (Blueprint $table) {
         $table->id();
         $table->char('batch_id', 36);
         $table->unsignedBigInteger('user_id')->index();
         $table->string('name');
         $table->string('actionable_type');
-
-        // WAS: $table->unsignedBigInteger('actionable_id');
-        $table->char('actionable_id', 26);
-
+-       $table->unsignedBigInteger('actionable_id');
++       $table->char('actionable_id', 26);
         $table->string('target_type');
-
-        // WAS: $table->unsignedBigInteger('target_id');
-        $table->char('target_id', 26);
+-       $table->unsignedBigInteger('target_id');
++       $table->char('target_id', 26);
         $table->string('model_type');
-
-        // WAS: $table->unsignedBigInteger('model_id')->nullable();
-        $table->char('model_id', 26);
+-       $table->unsignedBigInteger('model_id')->nullable();
++       $table->char('model_id', 26);
         $table->text('fields');
         $table->string('status', 25)->default('running');
         $table->text('exception');
