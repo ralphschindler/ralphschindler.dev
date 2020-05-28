@@ -43,7 +43,7 @@ If you are building an app that has a database, and you're not housing millions 
 
 ## ULID In Laravel Eloquent Models
 
-To use ULIDs in Laravel, php more specifically, we need to either write a generator or use a 3rd party library. While the implementation is trivial enough, I've found there exists a good library that works and is maintained, so let's install that:
+To use ULIDs in Laravel, php more specifically, we need to either write a generator or use a 3rd party library (I use this one [https://github.com/robinvdvleuten/php-ulid](https://github.com/robinvdvleuten/php-ulid).) While the implementation is trivial enough, I've found there exists a good library that works and is maintained, so let's install that:
 
     composer require robinvdvleuten/ulid
 
