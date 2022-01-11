@@ -1,0 +1,307 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Ralph Schindler</title>
+    <link href="https://ralphschindler.dev" />
+    <link type="application/atom+xml" rel="self" href="https://ralphschindler.dev/articles/feed.atom" />
+    <updated>2022-01-11T14:43:40+00:00</updated>
+    <id>https://ralphschindler.dev/articles/feed.atom</id>
+    <author>
+        <name>Ralph Schindler</name>
+    </author>
+                <entry>
+    <id>https://ralphschindler.dev/article/laravel-plus-nova-with-ulid-primary-keys</id>
+    <link type="text/html" rel="alternate" href="https://ralphschindler.dev/article/laravel-plus-nova-with-ulid-primary-keys" />
+    <title>Laravel + Nova With ULID Primary Keys</title>
+    <published>2020-05-25T00:00:00+00:00</published>
+    <updated>2020-05-25T00:00:00+00:00</updated>
+    <author>
+        <name>Ralph Schindler</name>
+    </author>
+    <summary type="html">In this short post, we&#039;ll explore what one has to do in order to build out a system that uses non-autoincrementing primary keys.  Why would we want to do this?
+
+Whether an internal or public facing, let&#039;s consider URL like......</summary>
+    <content type="html"><![CDATA[
+        <p>In this short post, we'll explore what one has to do in order to build out a system that uses non-autoincrementing primary keys.  Why would we want to do this?</p>
+
+<p>Whether an internal or public facing, let's consider URL like <code>https://example.com/things/12345</code> and what qualities it has:</p>
+
+<ul>
+<li>it potentially exposes that the generation of new ID's as being possibly sequential, which might encourage URL guessing</li>
+<li>it also, potentially exposes the size of the dataset</li>
+<li>it might imply that the database is in charge of assigning new IDs (thus they can't be created offline)</li>
+<li>the ID 12345 might exist in multiple tables</li>
+</ul>
+
+<p>Considering this, we may consider moving away from database assigned autoincrementing IDs. And for most developers, the first non-autoinc kind of identifier that comes to mind is a UUID (sometimes a GUID).</p>
+
+<p>One approach we may consider is to augment records with a UUID. The approach of augmentation means you may have both an <code>id</code> column and a <code>uuid</code> column in a record. Your foreign keys still are mapped to the unsigned integer <code>id</code> columns, but your <code>uuid</code> is what you may use when exposing the records as resources on a website or in a API.</p>
+
+<p>A natural alternative is using UUID's in the database as the <em>primary keys</em> themselves. This also means you're also using them as foreign keys in related tables.  We won't go into the specifics, but there is much discussion of the pros/cons of such an approach:</p>
+
+<ul>
+<li><a href="https://www.percona.com/blog/2019/11/22/uuids-are-popular-but-bad-for-performance-lets-discuss/">https://www.percona.com/blog/2019/11/22/uuids-are-popular-but-bad-for-performance-lets-discuss/</a></li>
+<li><a href="https://mysqlserverteam.com/storing-uuid-values-in-mysql-tables/">https://mysqlserverteam.com/storing-uuid-values-in-mysql-tables/</a></li>
+<li>Also, MySQL 8 has introduced some UUID specific functions and feature: <a href="https://mysqlserverteam.com/mysql-8-0-uuid-support/">https://mysqlserverteam.com/mysql-8-0-uuid-support/</a></li>
+</ul>
+
+<h2>ULIDs</h2>
+
+<p>An alternative to UUIDs that I like to use are ULIDs <a href="https://github.com/ulid/spec">https://github.com/ulid/spec</a>.  There are a couple of advantages to using ULIDs:</p>
+
+<ul>
+<li>when stored as strings, ULIDs take up 26 chars, whereas UUIDs take up 36 characters</li>
+<li>ULIDs, unlike most but not all UUID/GUID implementations, are sequential</li>
+<li>ULIDs are arguably "prettier", seemingly random and are case insensitve, eg: <code>01arz3ndektsv4rrffq69g5fav</code></li>
+</ul>
+
+<p>If you are building an app that has a database, and you're not housing millions and millions of rows but maybe tens or hundreds of thousands, ULIDs are a good choice as they have negligable performance issues (when inserting or used for foreign keys) and offer the right balance of features when using them for their random and sequential (for database indexing purposes) characteristics.  If you wanted more details and discussion, here are a few links I found:</p>
+
+<ul>
+<li><a href="https://news.ycombinator.com/item?id=13116308">https://news.ycombinator.com/item?id=13116308</a></li>
+<li><a href="https://www.honeybadger.io/blog/uuids-and-ulids/">https://www.honeybadger.io/blog/uuids-and-ulids/</a></li>
+</ul>
+
+<h2>ULID In Laravel Eloquent Models</h2>
+
+<p>To use ULIDs in Laravel, php more specifically, we need to either write a generator or use a 3rd party library (I use this one <a href="https://github.com/robinvdvleuten/php-ulid">https://github.com/robinvdvleuten/php-ulid</a>.) While the implementation is trivial enough, I've found there exists a good library that works and is maintained, so let's install that:</p>
+
+<pre><code>composer require robinvdvleuten/ulid
+</code></pre>
+
+<p>Then, let's build a migration, it will look something like this in the <code>up</code> method:</p>
+
+<pre><code class="language-php">    Schema::create('widgets', function (Blueprint $table) {
+        $table-&gt;char('id', 26)-&gt;primary(); // instead of $table-&gt;id(), which is an unsigned big integer, auto-incrementing
+        $table-&gt;string('name');
+        $table-&gt;timestamps();
+    });
+</code></pre>
+
+<p>Next, we need to build a Trait that will enable our models to create ULIDs.</p>
+
+<pre><code class="language-php">&lt;?php
+
+namespace App\Models\Concerns;
+
+use Ulid\Ulid;
+
+trait HasUlid
+{
+    public static function bootHasUlid()
+    {
+        // when creating models, we will generate a new ULID before saving
+        static::creating(function ($model) {
+            if (!isset($model-&gt;id)) {
+                $model-&gt;id = (string) Ulid::generate(true);
+            }
+        });
+    }
+
+    public function initializeHasUlid()
+    {
+        // initialize for this trait runs for every new instance, here
+        // we can change some default parameters for this model, specifically
+        // we can turn off incrementing and tell Eloquent the PK is a string
+
+        $this-&gt;incrementing = false;
+
+        $this-&gt;keyType = 'string';
+    }
+}
+</code></pre>
+
+<p>Now, our Widget model can consume this concern / trait:</p>
+
+<pre><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Widget extends Model
+{
+    use Concerns\HasUlid;
+}
+</code></pre>
+
+<h2>ULID in Laravel Nova</h2>
+
+<p>Out of the box, Laravel Nova assumes primary keys are going to be created with <code>$table-&gt;id()</code> in a migration. This is an important detail only with regards to Nova's built-in change tracking table <code>action_events</code>.  So, instead of the <code>action_events</code> table making references to models that are normally <em>unsigned big integers</em>, we have to make it so referenced models are tracked with <em>character size 26 columns</em>.</p>
+
+<p><img src="/assets/images/laravel-plus-nova-with-ulid-primary-keys/action-events.png" alt="Image of Nova" /></p>
+
+<p>To achieve this change, we'll have to publish the Nova migration, so we can change it:</p>
+
+<pre><code>artisan vendor:publish --tag=nova-migrations
+</code></pre>
+
+<p>Next, we'll have to go into <code>2018_01_01_000000_create_action_events_table.php</code>, and make the following changes:</p>
+
+<pre><code class="language-diff">    Schema::create('action_events', function (Blueprint $table) {
+        $table-&gt;id();
+        $table-&gt;char('batch_id', 36);
+        $table-&gt;unsignedBigInteger('user_id')-&gt;index();
+        $table-&gt;string('name');
+        $table-&gt;string('actionable_type');
+-       $table-&gt;unsignedBigInteger('actionable_id');
++       $table-&gt;char('actionable_id', 26);
+        $table-&gt;string('target_type');
+-       $table-&gt;unsignedBigInteger('target_id');
++       $table-&gt;char('target_id', 26);
+        $table-&gt;string('model_type');
+-       $table-&gt;unsignedBigInteger('model_id')-&gt;nullable();
++       $table-&gt;char('model_id', 26);
+        $table-&gt;text('fields');
+        $table-&gt;string('status', 25)-&gt;default('running');
+        $table-&gt;text('exception');
+        $table-&gt;timestamps();
+
+        $table-&gt;index(['actionable_type', 'actionable_id']);
+        $table-&gt;index(['batch_id', 'model_type', 'model_id']);
+    });
+</code></pre>
+
+<p>And that's it. Finally, we can create models that use a ULID and Laravel Nova will not complain:</p>
+
+<p><img src="/assets/images/laravel-plus-nova-with-ulid-primary-keys/created-widget.png" alt="Image of Nova" /></p>
+    ]]></content>
+</entry>
+            <entry>
+    <id>https://ralphschindler.dev/article/how-we-database-in-laravel</id>
+    <link type="text/html" rel="alternate" href="https://ralphschindler.dev/article/how-we-database-in-laravel" />
+    <title>How We Database In Laravel</title>
+    <published>2019-07-11T00:00:00+00:00</published>
+    <updated>2019-07-11T00:00:00+00:00</updated>
+    <author>
+        <name>Ralph Schindler</name>
+    </author>
+    <summary type="html">I&#039;ll first set the stage without going deep into our whole stack, but enough so there is a clear picture why and how we do what we do.  Nearly all of our Laravel based applications at Ziff Media Group are MySQL (AWS Aurora) backed.  Our application are......</summary>
+    <content type="html"><![CDATA[
+        <p>I'll first set the stage without going deep into our whole stack, but enough so there is a clear picture why and how we do what we do.  Nearly all of our Laravel based applications at <a href="https://www.ziffdavis.com">Ziff Media Group</a> are MySQL (AWS Aurora) backed.  Our application are deployed into a K8s cluster, our containers are Docker, the filesystem accessible to the application is typically AWS S3.</p>
+
+<p>These projects are generally monorepo, and the development environment is brought to life by Docker Compose. A developer merely needs run <code>docker-compose up -d</code>, which typically brings up the application web instance (in which nginx and php-fpm are entwined), a mysql instance that matches the Aurora version, and sometimes a touch of Redis too, depending on the project's needs.</p>
+
+<h2>Which Model To Choose</h2>
+
+<p>We've chosen the <em>"give developers a snapshot of production data"</em> model (a.k.a <em>The Individual Production Snapshot Model</em>). This means both the current state of the database's schema as well as the data. Before exploring what that model looks like, here are the models we chose not to use:</p>
+
+<h4>The "run all the migrations and use seeders" Model:</h4>
+
+<p>We chose not to use this model for two reasons.  The first is that it is typical that our projects would reach upwards of hundreds of migrations within a year, especially for the ones that have a large number of developers and/or are very active.  The second is that with seeding, you are generally working with contrived data.  Perhaps it is data created by Faker, or a set of real data. Either way, the Fake data offers less value, and the real data in a seeder will quickly become stale.  Both developers and QA Testers benefit from seeing real and current data in their development and QA instances of the project.</p>
+
+<h4>The "connect to a shared non-local database" Model:</h4>
+
+<p>We chose not to use this model primarily for concurrency reasons.  At any one time, many developers could be working on the same project.  Each might need to apply their own migration for their ticket/PR.  While we could keep cloning/resetting the shared instance back to a copy of production, there would still be scheduling conflicts when developers have migrations that have destructive data changes or significant changes to the schema.</p>
+
+<h2>The Individual Production Snapshot Model</h2>
+
+<p>This is the best model that fits our workflow. Every developer can start with a snapshot of the state of the production database. They are free to make whatever changes they need locally, destroy or modify the data as they see fit, and when they need, easily reset back to a fresh snapshot of production.</p>
+
+<p>It is also worth noting that the design of your system should be such that your production database is a manageable size.  For us, that generally means our production databases are a few to several hundred megs. We have one that is just under a terabyte, and this method still works well.</p>
+
+<blockquote>
+  <p>Note: to keep smaller databases, it's best to keep only application specific / domain specific data in the database. Data records like logging should go to an appropriate log location, user audit trails should go to an audit specific transfer and storage medium.  If that is not possible, keeping them in your production database but selecting which tables to NOT include in a snapshot is also possible.</p>
+</blockquote>
+
+<p>Originally, we achieved this through using a Spatie package <a href="https://github.com/spatie/laravel-db-snapshots">spatie/laravel-db-snapshots</a>. For most people's needs, this will work perfectly well. This tool shines when your production database is only a few megs.  It starts to break down when your production data set is beyond several megs. (The reason for this is that all the SQL in the mysqldump dump file is executed inside PHP's PDO query method when loading the data back in. This means you're bound by PHP's memory_limit and MySQL's client limitations: packet sizing, etc. I'm sure a pull request for this feature would be welcome).</p>
+
+<p>We settled on writing a highly specific Laravel Command to make nightly snapshots of production, we schedule this command to run <strong>nightly</strong>.  The gist of it's workflow is this:</p>
+
+<ul>
+<li>With the <code>create</code> argument it:
+
+<ul>
+<li>executes the command line <code>mysqldump</code> command to create a snapshot-data.sql file</li>
+<li>executes the command line gzip on the file to compress it</li>
+<li>moves the file to a place in the S3 bucket</li>
+</ul></li>
+<li>With the <code>load</code> argument it:
+
+<ul>
+<li>copies the snapshot-data.sql file from S3</li>
+<li>executes a gunzip and pipes the SQL into the mysql client command line tool</li>
+</ul></li>
+</ul>
+
+<p>Some other interesting things it does:</p>
+
+<ul>
+<li>prevents mishaps by ensuring you're not creating during local development environments, and loading in production environments</li>
+<li>it creates a mysql credentials file temporarily to ensure the mysql client won't complain about insecure usage of passwords (kudos to <a href="https://github.com/spatie/db-dumper">spatie/db-dumper</a> for that idea)</li>
+</ul>
+
+<script src="https://gist.github.com/ralphschindler/f29eba49eed76d384210a59daf900020.js"></script>
+
+<p>This script could likely be made more generic and packaged up for broader use, but we are not there yet. Many of the paths in here, the fact that it only supports MySQL, and some of the assumptions are specific to our environment and workflow. That said, maybe it will be packaged up one day.</p>
+
+<h3>We never go down</h3>
+
+<p>We don't write migration down methods. We never expect to use them. By rule, we never use them in production.  For development, a developer is free to use them while they are hacking on a ticket/PR, but we don't expect that to be committed to the migration.  Getting back to a clean state is as simple as re-importing the production snapshot.</p>
+
+<h3>Other Benefits To This Approach</h3>
+
+<p>We have a CI/CD and QA tooling setup that allows us to have every PR to the project brought up and kept current with the PR until it is merged.  This means that at any given time, there might be a handful to dozens of versions of this project running in our QA environment and developers local machines.</p>
+
+<p>So for any given PR to be ready to go through a QA process, from scratch to a working feature instance, the workflow roughly looks like this:</p>
+
+<ul>
+<li>QA instance pulls down source repository and checks out feature branch</li>
+<li><code>docker-compose up -d</code> (just as a developer would)</li>
+<li>run snapshot loader: <code>artisan app:snapshot load</code></li>
+<li>run migrations specific to feature branch: <code>artisan migrate</code></li>
+<li>(optionally run a seeder that puts data in the QA instance specific to the feature for testing)</li>
+</ul>
+
+<h2>Help: I have a Legacy Project I Want To Achieve This On</h2>
+
+<p>If you find yourself coming into a Laravel project that does not have a good workflow for managing their database, you can still get there.  Perhaps the project's migration files have been used haphazardly and running what migrations exist does not match the current structure of production, or maybe there are no migration files at all.</p>
+
+<p>Not a big deal. The first step would be to memorialize the state of the database as a "rollup" migration. (If migrations already exist but do not represent the current state of production, first remove the migrations, then follow along).  The general idea here is that even though we don't intend on running this rollup migration as part of a migration process, it will give a clear look backwards at the history of how the database got into a consistent state.</p>
+
+<p>There are several methods to producing this rollup migration:</p>
+
+<ul>
+<li>If you use SequelPro, perhaps use this bundle <a href="https://github.com/cviebrock/sequel-pro-laravel-export">cviebrock/sequel-pro-laravel-export</a></li>
+<li>Write a new migration by hand and run it against an empty database; mysqldump the results and compare those against a mysqldump of the production schema; wash, rinse, repeat until they look exactly the same.</li>
+<li>Use a tool that will statically analyze the database and produce a migration, like <a href="https://github.com/Xethron/migrations-generator">Xethron/migrations-generator</a></li>
+</ul>
+
+<p>Finally, make sure to clear out your migrations table in your production database and replace it with a single record for the rollup where the id is 1 and the migration is equal to the name of the rollup migration file (without the .php suffix) and the batch is equal to 1.</p>
+
+<h2>What About That Sensitive Information In The Database?</h2>
+
+<blockquote>
+  <p>This section added on July 15, 2019 after discussions on twitter and reddit.</p>
+</blockquote>
+
+<p>Some bit of important context that was hinted at but not explicitly spelled out should be reiterated to better frame this solution.  Our websites and CMSes (typically the ones that churn features daily) have a "product person" that does the acceptance for a new feature or bugfix. This person, prefers to look at a live and timely representation of the website/CMS in order to complete the acceptance part of the process.  With that in mind, an up-to-the-day snapshot of production satisfies that requirement.</p>
+
+<p>Additionally, these sites generally do not sensitive information that needs to be shielded from our developers.  But if they did, here are a few steps we'd take before we abandon the "The Individual Production Snapshot Model":</p>
+
+<h4>Structure Only Tables</h4>
+
+<p>When using <code>mysqldump</code> you have there are two interesting options:</p>
+
+<ol>
+<li>the ability to ignore certain tables with <code>--ignore-table</code> <a href="https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_ignore-table">manual</a></li>
+<li>the ability to do structure and no data for the whole import with <code>--no-data</code>: <a href="https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_no-data">manual</a>.</li>
+</ol>
+
+<p>To achieve full tables of non-sensitive data and structure only of sensitive data, a 2 file snapshot would need to be produced in the command. First use <code>mysqldump</code> to produce a snapshot of everything except the sensitive tables</p>
+
+<pre><code>mysqldump --skip-lock-tables --ignore-table=mydb.sensitive_table1 --ignore-table=mydb.sensitive_table2 mydatabase
+</code></pre>
+
+<p>then use a second file with the structure of the sensitive tables using (<em><code>mysqldump [options] db_name [tbl_name ...]</code></em> syntax)</p>
+
+<pre><code>mysqldump --skip-lock-tables --no-data mydatabase sensitive_table1 sensitive_table2`
+</code></pre>
+
+<p>Finally, use a seeder to generate a few well known seeds to stub in for the sensitive data.</p>
+
+<h4>Protecting Sensitive Workflows</h4>
+
+<p>This is a bit outside the scope of this article, but it's worth mentioning. Your local and QA environment probably shouldn't be sending mail out to a real SMTP server. If you have this functionality in an app, considering using a project like MailTrap (service) or a containerized app such as <a href="https://hub.docker.com/r/djfarrelly/maildev/">MailDev</a>.  Similarly, if you have API calls going to an API service, consider routing to a dev environment (if they provide one) or faking API calls.</p>
+    ]]></content>
+</entry>
+    </feed>
