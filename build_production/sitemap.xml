@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+ <url>
+  <loc>https://ralphschindler.dev</loc>
+  <lastmod>2022-01-11T14:43:40+00:00</lastmod>
+  <changefreq>daily</changefreq>
+ </url>
+ <url>
+  <loc>https://ralphschindler.dev/article/how-we-database-in-laravel</loc>
+  <lastmod>2022-01-11T14:43:40+00:00</lastmod>
+  <changefreq>daily</changefreq>
+ </url>
+ <url>
+  <loc>https://ralphschindler.dev/article/laravel-plus-nova-with-ulid-primary-keys</loc>
+  <lastmod>2022-01-11T14:43:40+00:00</lastmod>
+  <changefreq>daily</changefreq>
+ </url>
+ <url>
+  <loc>https://ralphschindler.dev/articles/feed.atom</loc>
+  <lastmod>2022-01-11T14:43:40+00:00</lastmod>
+  <changefreq>daily</changefreq>
+ </url>
+ <url>
+  <loc>https://ralphschindler.dev/articles</loc>
+  <lastmod>2022-01-11T14:43:40+00:00</lastmod>
+  <changefreq>daily</changefreq>
+ </url>
+</urlset>

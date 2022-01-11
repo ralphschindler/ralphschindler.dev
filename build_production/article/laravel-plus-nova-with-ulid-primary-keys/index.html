@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+        <title>Ralph Schindler | Laravel + Nova With ULID Primary Keys</title>
+        <meta name="description" content="Ralph Schindler is a PHP and Laravel enthusiast and a Software Architect at the Ziff Media Group">
+
+        <link rel="home" href="https://ralphschindler.dev">
+        <link rel="me" href="https://github.com/ralphschindler">
+        <link rel="webmention" href="https://webmention.io/ralphschindler.dev/webmention" />
+        <link rel="pingback" href="https://webmention.io/ralphschindler.dev/xmlrpc" />
+
+        <link href="/articles/feed.atom" type="application/atom+xml" rel="alternate" title="Ralph Schindler Atom Feed">
+
+            <meta property="og:title" content="Laravel + Nova With ULID Primary Keys" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://ralphschindler.dev/article/laravel-plus-nova-with-ulid-primary-keys"/>
+    <meta property="og:description" content="Using ULIDs for Primary Keys in Laravel and Laravel Nova applications" />
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@ralphschindler">
+    <meta name="twitter:creator" content="@ralphschindler">
+    <meta name="twitter:title" content="Laravel + Nova With ULID Primary Keys">
+    <meta name="twitter:description" content="Using ULIDs for Primary Keys in Laravel and Laravel Nova applications">
+    <meta name="twitter:image" content="https://ralphschindler.dev/assets/images/laravel-plus-nova-with-ulid-primary-keys/cover.png">
+
+                    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-143777600-1"></script>
+            <script>
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'UA-143777600-1');
+            </script>
+        
+        <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:300,300i,400,400i,700,700i,800,800i" rel="stylesheet">
+        <link rel="stylesheet" href="/assets/build/css/main.css?id=01c03589ccb86e515d07">
+    </head>
+
+    <body class="flex flex-col justify-between min-h-screen text-gray-800 leading-normal font-sans">
+        <header class="flex items-center shadow bg-white border-b h-24 py-4" role="banner">
+            <div class="container flex items-center max-w-6xl mx-auto px-4 lg:px-8">
+                <div class="flex items-center">
+                    <a href="/" title="Ralph Schindler home" class="inline-flex items-center">
+                        <img class="block h-12 sm:h-16 rounded-full mx-auto mb-4 sm:mb-0 sm:mr-4 sm:ml-0" src="https://avatars2.githubusercontent.com/u/76674?v=4" alt="">
+                        <div>
+                            <h1 class="text-lg md:text-2xl text-red-800 font-semibold hover:text-red-600 my-0">Ralph Schindler</h1>
+                            <div class="text-purple-800 text-xs">
+                                Principal Software Engineer at Ziff Davis / Ziff Media Group
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div id="vue-search" class="flex flex-1 justify-end items-center">
+                    <nav class="hidden lg:flex items-center justify-end text-lg">
+    <a title="Ralph Schindler Articles" href="/articles"
+        class="ml-6 text-gray-700 hover:text-blue-600 ">
+        Articles
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+                    <button class="flex justify-center items-center bg-blue border border-blue h-10 px-5 rounded-full lg:hidden focus:outline-none"
+    onclick="navMenu.toggle()"
+>
+    <svg id="js-nav-menu-show" xmlns="http://www.w3.org/2000/svg"
+        class="fill-current text-white h-9 w-4" viewBox="0 0 32 32"
+    >
+        <path d="M4,10h24c1.104,0,2-0.896,2-2s-0.896-2-2-2H4C2.896,6,2,6.896,2,8S2.896,10,4,10z M28,14H4c-1.104,0-2,0.896-2,2  s0.896,2,2,2h24c1.104,0,2-0.896,2-2S29.104,14,28,14z M28,22H4c-1.104,0-2,0.896-2,2s0.896,2,2,2h24c1.104,0,2-0.896,2-2  S29.104,22,28,22z"/>
+    </svg>
+
+    <svg id="js-nav-menu-hide" xmlns="http://www.w3.org/2000/svg"
+        class="hidden fill-current text-white h-9 w-4" viewBox="0 0 36 30"
+    >
+        <polygon points="32.8,4.4 28.6,0.2 18,10.8 7.4,0.2 3.2,4.4 13.8,15 3.2,25.6 7.4,29.8 18,19.2 28.6,29.8 32.8,25.6 22.2,15 "/>
+    </svg>
+</button>
+
+                </div>
+            </div>
+        </header>
+
+        <nav id="js-nav-menu" class="nav-menu hidden lg:hidden">
+    <ul class="list-reset my-0">
+        <li class="pl-4">
+            <a
+                title="Ralph Schindler Articles"
+                href="/articles"
+                class="nav-menu__item hover:text-blue "
+            >Articles</a>
+        </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </ul>
+</nav>
+
+        <main role="main" class="flex-auto w-full container max-w-5xl mx-auto py-16 px-6">
+                        <img src="/assets/images/laravel-plus-nova-with-ulid-primary-keys/cover.png" alt="Laravel + Nova With ULID Primary Keys cover image" class="mb-2">
+    
+    <h1 class="leading-none mb-2">Laravel + Nova With ULID Primary Keys</h1>
+
+    <p class="text-gray-700 text-xl md:mt-0">Ralph Schindler  •  May 25, 2020</p>
+
+    <div class="border-b border-blue-200 mb-10 pb-4" v-pre>
+        <p>In this short post, we'll explore what one has to do in order to build out a system that uses non-autoincrementing primary keys.  Why would we want to do this?</p>
+
+<p>Whether an internal or public facing, let's consider URL like <code>https://example.com/things/12345</code> and what qualities it has:</p>
+
+<ul>
+<li>it potentially exposes that the generation of new ID's as being possibly sequential, which might encourage URL guessing</li>
+<li>it also, potentially exposes the size of the dataset</li>
+<li>it might imply that the database is in charge of assigning new IDs (thus they can't be created offline)</li>
+<li>the ID 12345 might exist in multiple tables</li>
+</ul>
+
+<p>Considering this, we may consider moving away from database assigned autoincrementing IDs. And for most developers, the first non-autoinc kind of identifier that comes to mind is a UUID (sometimes a GUID).</p>
+
+<p>One approach we may consider is to augment records with a UUID. The approach of augmentation means you may have both an <code>id</code> column and a <code>uuid</code> column in a record. Your foreign keys still are mapped to the unsigned integer <code>id</code> columns, but your <code>uuid</code> is what you may use when exposing the records as resources on a website or in a API.</p>
+
+<p>A natural alternative is using UUID's in the database as the <em>primary keys</em> themselves. This also means you're also using them as foreign keys in related tables.  We won't go into the specifics, but there is much discussion of the pros/cons of such an approach:</p>
+
+<ul>
+<li><a href="https://www.percona.com/blog/2019/11/22/uuids-are-popular-but-bad-for-performance-lets-discuss/">https://www.percona.com/blog/2019/11/22/uuids-are-popular-but-bad-for-performance-lets-discuss/</a></li>
+<li><a href="https://mysqlserverteam.com/storing-uuid-values-in-mysql-tables/">https://mysqlserverteam.com/storing-uuid-values-in-mysql-tables/</a></li>
+<li>Also, MySQL 8 has introduced some UUID specific functions and feature: <a href="https://mysqlserverteam.com/mysql-8-0-uuid-support/">https://mysqlserverteam.com/mysql-8-0-uuid-support/</a></li>
+</ul>
+
+<h2>ULIDs</h2>
+
+<p>An alternative to UUIDs that I like to use are ULIDs <a href="https://github.com/ulid/spec">https://github.com/ulid/spec</a>.  There are a couple of advantages to using ULIDs:</p>
+
+<ul>
+<li>when stored as strings, ULIDs take up 26 chars, whereas UUIDs take up 36 characters</li>
+<li>ULIDs, unlike most but not all UUID/GUID implementations, are sequential</li>
+<li>ULIDs are arguably "prettier", seemingly random and are case insensitve, eg: <code>01arz3ndektsv4rrffq69g5fav</code></li>
+</ul>
+
+<p>If you are building an app that has a database, and you're not housing millions and millions of rows but maybe tens or hundreds of thousands, ULIDs are a good choice as they have negligable performance issues (when inserting or used for foreign keys) and offer the right balance of features when using them for their random and sequential (for database indexing purposes) characteristics.  If you wanted more details and discussion, here are a few links I found:</p>
+
+<ul>
+<li><a href="https://news.ycombinator.com/item?id=13116308">https://news.ycombinator.com/item?id=13116308</a></li>
+<li><a href="https://www.honeybadger.io/blog/uuids-and-ulids/">https://www.honeybadger.io/blog/uuids-and-ulids/</a></li>
+</ul>
+
+<h2>ULID In Laravel Eloquent Models</h2>
+
+<p>To use ULIDs in Laravel, php more specifically, we need to either write a generator or use a 3rd party library (I use this one <a href="https://github.com/robinvdvleuten/php-ulid">https://github.com/robinvdvleuten/php-ulid</a>.) While the implementation is trivial enough, I've found there exists a good library that works and is maintained, so let's install that:</p>
+
+<pre><code>composer require robinvdvleuten/ulid
+</code></pre>
+
+<p>Then, let's build a migration, it will look something like this in the <code>up</code> method:</p>
+
+<pre><code class="language-php">    Schema::create('widgets', function (Blueprint $table) {
+        $table-&gt;char('id', 26)-&gt;primary(); // instead of $table-&gt;id(), which is an unsigned big integer, auto-incrementing
+        $table-&gt;string('name');
+        $table-&gt;timestamps();
+    });
+</code></pre>
+
+<p>Next, we need to build a Trait that will enable our models to create ULIDs.</p>
+
+<pre><code class="language-php">&lt;?php
+
+namespace App\Models\Concerns;
+
+use Ulid\Ulid;
+
+trait HasUlid
+{
+    public static function bootHasUlid()
+    {
+        // when creating models, we will generate a new ULID before saving
+        static::creating(function ($model) {
+            if (!isset($model-&gt;id)) {
+                $model-&gt;id = (string) Ulid::generate(true);
+            }
+        });
+    }
+
+    public function initializeHasUlid()
+    {
+        // initialize for this trait runs for every new instance, here
+        // we can change some default parameters for this model, specifically
+        // we can turn off incrementing and tell Eloquent the PK is a string
+
+        $this-&gt;incrementing = false;
+
+        $this-&gt;keyType = 'string';
+    }
+}
+</code></pre>
+
+<p>Now, our Widget model can consume this concern / trait:</p>
+
+<pre><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Widget extends Model
+{
+    use Concerns\HasUlid;
+}
+</code></pre>
+
+<h2>ULID in Laravel Nova</h2>
+
+<p>Out of the box, Laravel Nova assumes primary keys are going to be created with <code>$table-&gt;id()</code> in a migration. This is an important detail only with regards to Nova's built-in change tracking table <code>action_events</code>.  So, instead of the <code>action_events</code> table making references to models that are normally <em>unsigned big integers</em>, we have to make it so referenced models are tracked with <em>character size 26 columns</em>.</p>
+
+<p><img src="/assets/images/laravel-plus-nova-with-ulid-primary-keys/action-events.png" alt="Image of Nova" /></p>
+
+<p>To achieve this change, we'll have to publish the Nova migration, so we can change it:</p>
+
+<pre><code>artisan vendor:publish --tag=nova-migrations
+</code></pre>
+
+<p>Next, we'll have to go into <code>2018_01_01_000000_create_action_events_table.php</code>, and make the following changes:</p>
+
+<pre><code class="language-diff">    Schema::create('action_events', function (Blueprint $table) {
+        $table-&gt;id();
+        $table-&gt;char('batch_id', 36);
+        $table-&gt;unsignedBigInteger('user_id')-&gt;index();
+        $table-&gt;string('name');
+        $table-&gt;string('actionable_type');
+-       $table-&gt;unsignedBigInteger('actionable_id');
++       $table-&gt;char('actionable_id', 26);
+        $table-&gt;string('target_type');
+-       $table-&gt;unsignedBigInteger('target_id');
++       $table-&gt;char('target_id', 26);
+        $table-&gt;string('model_type');
+-       $table-&gt;unsignedBigInteger('model_id')-&gt;nullable();
++       $table-&gt;char('model_id', 26);
+        $table-&gt;text('fields');
+        $table-&gt;string('status', 25)-&gt;default('running');
+        $table-&gt;text('exception');
+        $table-&gt;timestamps();
+
+        $table-&gt;index(['actionable_type', 'actionable_id']);
+        $table-&gt;index(['batch_id', 'model_type', 'model_id']);
+    });
+</code></pre>
+
+<p>And that's it. Finally, we can create models that use a ULID and Laravel Nova will not complain:</p>
+
+<p><img src="/assets/images/laravel-plus-nova-with-ulid-primary-keys/created-widget.png" alt="Image of Nova" /></p>
+    </div>
+
+    <nav class="flex justify-between text-sm md:text-base">
+        <div>
+                            <a href="https://ralphschindler.dev/article/how-we-database-in-laravel" title="Older Post: How We Database In Laravel">
+                    &LeftArrow; How We Database In Laravel
+                </a>
+                    </div>
+
+        <div>
+                    </div>
+    </nav>
+        </main>
+
+        <footer class="bg-white text-center text-sm mt-12 py-4" role="contentinfo">
+            <ul class="flex flex-col md:flex-row justify-center list-reset">
+                <li class="md:mr-2">
+                    &copy; <a href="https://ralphschindler.dev" title="Ralph Schindler">Ralph Schindler</a> 2022.
+                </li>
+
+                <li>
+                    Built with <a href="http://jigsaw.tighten.co" title="Jigsaw by Tighten">Jigsaw</a>,
+                    <a href="https://tailwindcss.com" title="Tailwind CSS, a utility-first CSS framework">Tailwind CSS</a>,
+                    and <a href="https://laravel.com" title="Laravel">Laravel</a>.
+                </li>
+            </ul>
+        </footer>
+
+        <script src="/assets/build/js/main.js?id=52eadd246411e82cc35c"></script>
+
+        <script>
+    const navMenu = {
+        toggle() {
+            const menu = document.getElementById('js-nav-menu');
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('lg:block');
+            document.getElementById('js-nav-menu-hide').classList.toggle('hidden');
+            document.getElementById('js-nav-menu-show').classList.toggle('hidden');
+        },
+    }
+</script>
+    </body>
+</html>
