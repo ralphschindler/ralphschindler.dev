@@ -40,7 +40,7 @@
                         <div>
                             <h1 class="text-lg md:text-2xl text-red-800 font-semibold hover:text-red-600 my-0">{{ $page->siteName }}</h1>
                             <div class="text-purple-800 text-xs">
-                                Software Architect at Ziff Media Group
+                                Principal Software Engineer at Ziff Davis / Ziff Media Group
                             </div>
                         </div>
                     </a>
