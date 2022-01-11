@@ -1,4 +1,4 @@
-name: Build & Publish
+name: Build And Publish
 
 on:
   push:
@@ -22,4 +22,5 @@ jobs:
           git config --local user.name "GitHub Actions"
           git add -f build_production
           git commit -m "Build for deploy"
-          git subtree split --prefix build_production origin gh-pages
+          git subtree split --prefix build_production -b gh-pages
+          git push -f origin gh-pages:gh-pages
