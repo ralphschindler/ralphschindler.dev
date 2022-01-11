@@ -16,15 +16,10 @@ jobs:
         run: npm install
       - name: Build Site
         run: npm run production && rm build_production/assets/build/.gitignore
-      - name: Stage Files
-        run: git add -f build_production
-      - name: Commit files
+      - name: Commit and Publish
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
+          git add -f build_production
           git commit -m "Build for deploy"
-      - name: Publish
-        run: |
-          git subtree split --prefix build_production -b master
-          git push -f origin master:master
-          git branch -D master
+          git subtree split --prefix build_production origin gh-pages
